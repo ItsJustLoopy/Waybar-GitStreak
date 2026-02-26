@@ -80,16 +80,33 @@ def get_streak(username: str, token: str) -> int:
                 current -= timedelta(days=1)
 
             return streak
-    except HTTPError as e:
-        print(f"HTTP error: {e.code} - {e.reason}")
+    except HTTPError:
         return 0
-    except URLError as e:
-        print(f"URL error: {e.reason}")
+    except URLError:
         return 0
-    except Exception as e:
-        print(f"Unexpected error: {e}")
+    except Exception:
         return 0
 
 
-user_config = get_config()
-user_config.update({"value": get_streak(user_config["username"], user_config["token"])}) if user_config else None
+def to_waybar_output(user_config: dict | None) -> dict: 
+    if not user_config:
+        return {
+            "text": " ?",
+            "tooltip": "Set GITHUB_USERNAME and GITHUB_TOKEN",
+            "class": "error",
+        }
+
+    streak_value = get_streak(user_config["username"], user_config["token"])
+    unit = user_config["unit"]
+
+    return {
+        "text": f"{user_config['icon']} {streak_value}",
+        "tooltip": f"GitHub contribution streak: {streak_value} {unit}",
+        "class": "ok",
+    }
+
+
+if __name__ == "__main__":
+    user_config = get_config()
+    output = to_waybar_output(user_config)
+    print(json.dumps(output))
