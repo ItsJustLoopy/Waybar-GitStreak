@@ -1,9 +1,10 @@
 # Waybar GitStreak
+Waybar GitStreak is a script written in Python which integrates your current github contribution streak right into the Waybar.
+
+I created it as a way to keep myself motivated to make github contributions daily, and I hope this helps anyone hoping to do the same.
 
 ![WaybarGitStreakPreview](https://github.com/user-attachments/assets/96b805c8-16d6-42f9-8d86-f488fb8055bd)
-
-I created Waybar GitStreak as a way to keep myself motivated to make github contributions daily, and I hope this helps anyone hoping to do the same.
-
+[Big thank you to <a href="https://www.github.com/OldJobobo" target="_blank">@OldJobobo</a> for the Monolith Omarchy theme used in the preview above.]
 
 # Installation
 
