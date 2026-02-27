@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import sys
 from datetime import date, datetime, timedelta
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -13,9 +14,39 @@ config = {
     "unit": "day(s)"
 }
 
+APP_CONFIG_DIR = os.path.expanduser("~/.config/waybar-gitstreak")
+APP_CONFIG_PATH = os.path.join(APP_CONFIG_DIR, "config.json")
+
+
+def load_saved_username() -> str | None:
+    try:
+        with open(APP_CONFIG_PATH, "r", encoding="utf-8") as config_file:
+            data = json.load(config_file)
+            username = data.get("username")
+            return username if isinstance(username, str) and username else None
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return None
+
+
+def save_username(username: str) -> bool:
+    try:
+        os.makedirs(APP_CONFIG_DIR, exist_ok=True)
+        with open(APP_CONFIG_PATH, "w", encoding="utf-8") as config_file:
+            json.dump({"username": username.strip()}, config_file)
+        return True
+    except OSError:
+        return False
+
+
+def resolve_username() -> str | None:
+    env_username = os.getenv("GITHUB_USERNAME")
+    if env_username:
+        return env_username
+    return load_saved_username()
+
 
 def get_config() -> dict | None:
-    username = os.getenv("GITHUB_USERNAME")
+    username = resolve_username()
 
     if not username:
         return None
@@ -80,7 +111,7 @@ def to_waybar_output(user_config: dict | None) -> dict:
     if not user_config:
         return {
             "text": " ?",
-            "tooltip": "Set GITHUB_USERNAME",
+            "tooltip": "Set GITHUB_USERNAME or run: github_streak.py --set-username <name>",
             "class": "error",
         }
 
@@ -93,7 +124,7 @@ def to_waybar_output(user_config: dict | None) -> dict:
         tooltip = f"{tooltip} • No contribution yet today"
 
     return {
-        "text": f"{user_config['icon']} {streak_value}",
+        "text": f" {user_config['icon']} {streak_value}",
         "tooltip": tooltip,
         "class": css_class,
         "at_risk": at_risk,
@@ -101,6 +132,14 @@ def to_waybar_output(user_config: dict | None) -> dict:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) == 3 and sys.argv[1] == "--set-username":
+        success = save_username(sys.argv[2])
+        if success:
+            print(f"Saved username to {APP_CONFIG_PATH}")
+        else:
+            print("Failed to save username")
+        raise SystemExit(0 if success else 1)
+
     user_config = get_config()
     output = to_waybar_output(user_config)
     print(json.dumps(output))
