@@ -12,4 +12,10 @@ Then restart Waybar using the command:
 pkill waybar || true; waybar &
 ```
 
+To uninstall Waybar GitStreak, run the following command:
+
+```bash
+./uninstall.sh && pkill waybar || true; waybar &
+```
+
 The installer adds `custom/github_streak` to `modules-center`, right of `clock` when present (always there for omarchy users if you have not changed it) and sets refresh to 5 minutes.
