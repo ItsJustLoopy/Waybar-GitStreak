@@ -27,7 +27,7 @@ The installer adds `custom/github_streak` to `modules-center`, right of `clock` 
 To uninstall Waybar GitStreak, run the following command:
 
 ```bash
-./uninstall.sh && pkill waybar || true; waybar &
+./uninstall.sh
 ```
 
 Then restart Waybar using the command:
